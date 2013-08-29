@@ -215,6 +215,7 @@ private slots:
     void testProxyModelChangedAfterMove();
 
     void typedModel();
+    void displayMargin();
 
     void highlightItemGeometryChanges();
 
@@ -7056,6 +7057,43 @@ void tst_QQuickListView::highlightItemGeometryChanges()
         QTRY_COMPARE(listview->highlightItem()->width(), qreal(100 + i * 20));
         QTRY_COMPARE(listview->highlightItem()->height(), qreal(100 + i * 10));
     }
+}
+
+void tst_QQuickListView::displayMargin()
+{
+    QQuickView *window = createView();
+    window->setSource(testFileUrl("displayMargin.qml"));
+    window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+
+    QQuickListView *listview = window->rootObject()->findChild<QQuickListView*>();
+    QVERIFY(listview != 0);
+
+    QQuickItem *content = listview->contentItem();
+    QVERIFY(content != 0);
+
+    QQuickItem *item0;
+    QQuickItem *item14;
+
+    QVERIFY(item0 = findItem<QQuickItem>(content, "delegate", 0));
+    QCOMPARE(delegateVisible(item0), true);
+
+    // the 14th item should be within the end margin
+    QVERIFY(item14 = findItem<QQuickItem>(content, "delegate", 13));
+    QCOMPARE(delegateVisible(item14), true);
+
+    // the 15th item should be outside the end margin
+    QVERIFY(findItem<QQuickItem>(content, "delegate", 14) == 0);
+
+    // the first delegate should still be within the begin margin
+    listview->positionViewAtIndex(3, QQuickListView::Beginning);
+    QCOMPARE(delegateVisible(item0), true);
+
+    // the first delegate should now be outside the begin margin
+    listview->positionViewAtIndex(4, QQuickListView::Beginning);
+    QCOMPARE(delegateVisible(item0), false);
+
+    delete window;
 }
 
 QTEST_MAIN(tst_QQuickListView)

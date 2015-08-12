@@ -41,6 +41,14 @@ mobile and embedded systems without rewriting the source code.
 .
 This package contains the Declarative library development files
 
+%package doc
+Summary:    Qt Declarative - documentation
+Group:      Qt/Qt
+Requires:   %{name} = %{version}-%{release}
+
+%description doc
+This package contains the Qt Declarative documentation
+
 %package qtquicktest
 Summary:    Qt Declarative QtQuickTest library
 Group:      Qt/Qt
@@ -78,6 +86,15 @@ Requires:   qt5-qtdeclarative-qtquick = %{version}-%{release}
 %description qtquick-devel
 This package contains the development headers for legacy QtQuick 1
 QML support library
+
+%package qtquick-doc
+Summary:    Qt Declarative - QtQuick documentation
+Group:      Qt/Qt
+Requires:   %{name} = %{version}-%{release}
+Requires:   qt5-qtdeclarative-qtquick = %{version}-%{release}
+
+%description qtquick-doc
+This package contains the Qt Declarative QtQuick documentation
 
 %package qtquickparticles
 Summary:    Qt Declarative - QtQuick Particles library
@@ -268,6 +285,11 @@ touch .git
 
 make %{?_smp_mflags}
 
+%if 0%{?qt5_release_build}
+make docs
+%endif
+
+
 %install
 rm -rf %{buildroot}
 %qmake5_install
@@ -289,6 +311,15 @@ cp lib/libQt5QmlDevTools.a %{buildroot}/%{_libdir}
 %fdupes %{buildroot}/%{_includedir}
 
 
+# Copy docs
+mkdir -p %{buildroot}/%{_docdir}/qt5/qtqml
+mkdir -p %{buildroot}/%{_docdir}/qt5/qtquick
+%if 0%{?qt5_release_build}
+cp -R doc/qtqml %{buildroot}/%{_docdir}/qt5
+cp -R doc/qtqml.qch %{buildroot}/%{_docdir}/qt5
+cp -R doc/qtquick %{buildroot}/%{_docdir}/qt5
+cp -R doc/qtquick.qch %{buildroot}/%{_docdir}/qt5
+%endif
 
 
 #### Pre/Post section
@@ -338,6 +369,8 @@ cp lib/libQt5QmlDevTools.a %{buildroot}/%{_libdir}
 %{_datadir}/qt5/mkspecs/modules/qt_lib_qml_private.pri
 %{_libdir}/cmake/
 
+%files doc
+%{_docdir}/qt5/qtqml*
 
 %files qtquick
 %defattr(-,root,root,-)
@@ -353,6 +386,8 @@ cp lib/libQt5QmlDevTools.a %{buildroot}/%{_libdir}
 %{_datadir}/qt5/mkspecs/modules/qt_lib_quick.pri
 %{_datadir}/qt5/mkspecs/modules/qt_lib_quick_private.pri
 
+%files qtquick-doc
+%{_docdir}/qt5/qtquick*
 
 
 
